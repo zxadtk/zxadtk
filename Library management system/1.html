@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .container {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            background-color: #0056b3;
+            text-align: left;
+            color: white;
+            margin-bottom: 0px;
+        }
+
+        .menu-bar {
+            background-color: #0056b3;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: flex-end;
+        }
+
+        .menu-bar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .menu-bar a:hover {
+            background-color: #0056b3;
+            color: black;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            width: 100%;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #f1f1f1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            padding: 2px 0;
+            position: relative;
+        }
+
+        .sidebar a {
+            color: #333;
+            text-decoration: none;
+            display: block;
+            padding-left: 20px;
+            transition: all 0.3s;
+            font-size: 18px;
+            background-color: transparent;
+        }
+
+        .sidebar a:hover {
+            background-color: #0056b3;
+            color: white;
+        }
+
+        .sidebar.top-level-link {
+            font-weight: bold;
+            text-align: center;
+            font-size: 20px;
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-right: 10px;
+        }
+
+        .sidebar ul ul {
+            display: none;
+            padding-left: 20px;
+        }
+
+        .sidebar li.active>ul {
+            display: block;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            background-color: #fff;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"] {
+            width: 100%;
+            height: 40px;
+            padding: 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            color: #333;
+            outline: none;
+        }
+
+        input[type="text"]:hover,
+        input[type="email"]:hover,
+        input[type="tel"]:hover {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        select,
+        .custom-select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            color: #333;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position-x: 95%;
+            background-position-y: 50%;
+        }
+
+        select:hover,
+        .custom-select:hover {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        button {
+            width: 120px;
+            height: 40px;
+            padding: 0;
+            background: linear-gradient(45deg, #007BFF, #0056b3);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+            color: black;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 10px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: 5px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination button {
+            margin: 0 5px;
+        }
+
+        .search-form {
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-form input,
+        .search-form button {
+            width: 18%;
+            height: 40px;
+            padding: 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            color: #333;
+            outline: none;
+            margin: 5px;
+        }
+
+        .search-form input:hover {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-form button {
+            width: 120px;
+            background: linear-gradient(45deg, #007BFF, #0056b3);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .search-form button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+            color: black;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #fff;
+            margin: 0 10px;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .logout-btn:hover {
+            text-decoration: underline;
+        }
+
+        /* 权限设置页面样式 */
+        .permission-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .permission-form label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .permission-form input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .permission-form .menu-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .permission-form .menu-item label {
+            margin: 0;
+        }
+
+        .sidebar li {
+    display: none; /* 默认隐藏所有菜单项 */
+}
+
+.sidebar li.active {
+    display: block; /* 显示激活的菜单项 */
+}
+
+.sidebar ul ul {
+    display: none; /* 默认隐藏二级菜单项 */
+}
+
+.sidebar li.active ul {
+    display: block; /* 显示激活的二级菜单项 */
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>图书管理系统</h1>
+        <div class="menu-bar">
+            <a href="#">首页</a>
+            <div>
+                <a href="#" class="active">图书管理</a>
+                <a href="#">读者管理</a>
+                <a href="#">借阅管理</a>
+                <a href="#">统计分析</a>
+                <a href="#">系统管理</a>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar"></div>
+                <a href="登录页面_OK.html">退出</a>
+            </div>
+        </div>
+        <div class="content">
+            <div class="sidebar">
+                <ul>
+                    <li>
+                        <a href="#" class="top-level-link" id="menu1">图书管理
+                            <i class="fa-solid fa-chevron-down"></i>
+                            <i class="fa-solid fa-chevron-up" style="display: none;"></i>
+                        </a>
+                        <ul>
+                            <li><a href="#" class="book-list-link" id="menu1-1">图书列表</a></li>
+                            <li><a href="#" class="add-book-link" id="menu1-2">添加图书</a></li>
+                            <li><a href="#" class="edit-book-link" id="menu1-3">修改图书</a></li>
+                            <li><a href="#" class="delete-book-link" id="menu1-4">删除图书</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="top-level-link" id="menu2">读者管理
+                            <i class="fa-solid fa-chevron-down"></i>
+                            <i class="fa-solid fa-chevron-up" style="display: none;"></i>
+                        </a>
+                        <ul>
+                            <li><a href="#" class="reader-list-link" id="menu2-5">读者列表</a></li>
+                            <li><a href="#" class="add-reader-link" id="menu2-6">添加读者</a></li>
+                            <li><a href="#" id="menu2-7">修改读者信息</a></li>
+                            <li><a href="#" id="menu2-8">删除读者</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="top-level-link" id="menu3">借阅管理
+                            <i class="fa-solid fa-chevron-down"></i>
+                            <i class="fa-solid fa-chevron-up" style="display: none;"></i>
+                        </a>
+                        <ul>
+                            <li><a href="#" id="menu3-9">借阅记录</a></li>
+                            <li><a href="#" id="menu3-10">办理借阅</a></li>
+                            <li><a href="#" id="menu3-11">归还图书</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="top-level-link" id="menu4">统计分析
+                            <i class="fa-solid fa-chevron-down"></i>
+                            <i class="fa-solid fa-chevron-up" style="display: none;"></i>
+                        </a>
+                        <ul>
+                            <li><a href="#" id="menu4-12">图书借阅统计</a></li>
+                            <li><a href="#" id="menu4-13">读者借阅统计</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="top-level-link" id="menu5">系统管理
+                            <i class="fa-solid fa-chevron-down"></i>
+                            <i class="fa-solid fa-chevron-up" style="display: none;"></i>
+                        </a>
+                        <ul>
+                            <li><a href="#" class="user-list-link" id="menu5-14">用户管理</a></li>
+                            <li><a href="#" class="permission-link" id="menu5-15">权限设置</a></li>
+                            <li><a href="#" id="menu5-16">数据备份与恢复</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="main-content">
+                <h2>欢迎使用图书管理系统</h2>
+                <p>这里是主内容区域，将根据您选择的功能菜单进行展示。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增弹窗 -->
+    <div id="addReaderModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">添加读者</h2>
+            <form id="addReaderForm">
+                <label for="customer_id">客户号：</label>
+                <input type="text" id="customer_id" name="customer_id" required>
+
+                <label for="customer_name">客户姓名：</label>
+                <input type="text" id="customer_name" name="customer_name" required>
+
+                <label for="gender">性别：</label>
+                <!-- 添加自定义类名 -->
+                <select id="gender" name="gender" class="custom-select" required>
+                    <option value="男">男</option>
+                    <option value="女">女</option>
+                </select>
+
+                <label for="id_number">身份证号码：</label>
+                <input type="text" id="id_number" name="id_number" required>
+
+                <label for="contact_phone">联系电话：</label>
+                <input type="tel" id="contact_phone" name="contact_phone" required>
+
+                <label for="email">电子邮箱：</label>
+                <input type="email" id="email" name="email" required>
+
+                <button type="submit">提交</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 权限设置弹窗 -->
+    <div id="permissionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle1">权限设置</h2>
+            <form id="permissionForm" class="permission-form">
+                <label for="role_name">角色名称：</label>
+                <input type="text" id="role_name" name="role_name" required>
+
+                <label>可访问菜单：</label>
+                <div class="menu-item">
+                    <input type="checkbox" id="menu1" name="accessible_menus" value="图书管理">
+                    <label for="menu1">图书管理</label>
+                </div>
+                <div class="menu-item">
+                    <input type="checkbox" id="menu2" name="accessible_menus" value="读者管理">
+                    <label for="menu2">读者管理</label>
+                </div>
+                <div class="menu-item">
+                    <input type="checkbox" id="menu3" name="accessible_menus" value="借阅管理">
+                    <label for="menu3">借阅管理</label>
+                </div>
+                <div class="menu-item">
+                    <input type="checkbox" id="menu4" name="accessible_menus" value="统计分析">
+                    <label for="menu4">统计分析</label>
+                </div>
+                <div class="menu-item">
+                    <input type="checkbox" id="menu5" name="accessible_menus" value="系统管理">
+                    <label for="menu5">系统管理</label>
+                </div>
+
+                <button type="submit">保存</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 分配角色弹窗 -->
+    <div id="assignRoleModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle2">分配角色</h2>
+            <form id="assignRoleForm">
+                <label for="username">用户名：</label>
+                <input type="text" id="username" name="username" disabled>
+
+                <label>可分配角色：</label>
+                <div id="roleCheckboxes"></div>
+
+                <button type="submit">保存</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let topLevelLinks; // 定义为全局变量
+        document.addEventListener('DOMContentLoaded', function () {
+            topLevelLinks = document.querySelectorAll('.top-level-link'); // 赋值给全局变量
+            const sidebarLinks = document.querySelectorAll('.sidebar a');
+            const mainContent = document.querySelector('.main-content');
+            const permissionModal = document.getElementById('permissionModal');
+            const addReaderModal = document.getElementById('addReaderModal');
+            const assignRoleModal = document.getElementById('assignRoleModal');
+            const closeModalButtons = document.querySelectorAll('.close');
+            const modalTitle = document.getElementById('modalTitle');
+            const permissionForm = document.getElementById('permissionForm');
+            const assignRoleForm = document.getElementById('assignRoleForm');
+            let currentPage = 1;
+            const itemsPerPage = 10;
+
+            // 绑定点击事件
+    topLevelLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            console.log('一级菜单被点击:', this.textContent); // 调试信息
+
+            const subMenu = this.nextElementSibling;
+            const parentLi = this.parentNode;
+            parentLi.classList.toggle('active');
+
+            const expandIcon = this.querySelector('.fa-chevron-down');
+            const collapseIcon = this.querySelector('.fa-chevron-up');
+
+            console.log('subMenu:', subMenu); // 调试信息
+            console.log('parentLi:', parentLi); // 调试信息
+            console.log('expandIcon:', expandIcon); // 调试信息
+            console.log('collapseIcon:', collapseIcon); // 调试信息
+
+            if (parentLi.classList.contains('active')) {
+                subMenu.style.display = 'block';
+                expandIcon.style.display = 'none';
+                collapseIcon.style.display = 'inline';
+            } else {
+                subMenu.style.display = 'none';
+                expandIcon.style.display = 'inline';
+                collapseIcon.style.display = 'none';
+            }
+        });
+    });
+
+            // 从 localStorage 中读取 accessible_menus
+    const accessibleMenus = JSON.parse(localStorage.getItem('accessible_menus'));
+    console.log('读取的 accessible_menus:', accessibleMenus);
+    if (accessibleMenus) {
+        showMenuBasedOnPermissions(accessibleMenus);
+    }
+});
+
+function showMenuBasedOnPermissions(accessibleMenus) {
+    const menuItems = document.querySelectorAll('.sidebar li'); // 获取所有一级菜单项
+
+    // 隐藏所有菜单项
+    menuItems.forEach(menuItem => {
+        menuItem.style.display = 'none';
+    });
+
+    // 显示可访问的菜单项及其二级菜单项
+    accessibleMenus.forEach(menuId => {
+        const menuItem = document.querySelector(`.sidebar li a[id="menu${menuId}"]`);
+        if (menuItem) {
+            const parentLi = menuItem.closest('li'); // 找到一级菜单项的父元素
+            parentLi.style.display = 'block'; // 显示一级菜单项
+
+            // 显示二级菜单项
+            const subMenu = parentLi.querySelector('ul');
+            if (subMenu) {
+                subMenu.style.display = 'block';
+            }
+        }
+    });
+}
+
+<!--            // 处理一级菜单点击事件，用于展开和收起二级菜单-->
+<!--            topLevelLinks.forEach(link => {-->
+<!--    link.addEventListener('click', function (e) {-->
+<!--        e.preventDefault();-->
+<!--        console.log('一级菜单被点击:', this.textContent); // 调试信息-->
+<!--        const subMenu = this.nextElementSibling;-->
+<!--        const parentLi = this.parentNode;-->
+<!--        parentLi.classList.toggle('active');-->
+<!--        const expandIcon = this.querySelector('.fa-chevron-down');-->
+<!--        const collapseIcon = this.querySelector('.fa-chevron-up');-->
+<!--        if (parentLi.classList.contains('active')) {-->
+<!--            subMenu.style.display = 'block';-->
+<!--            expandIcon.style.display = 'none';-->
+<!--            collapseIcon.style.display = 'inline';-->
+<!--        } else {-->
+<!--            subMenu.style.display = 'none';-->
+<!--            expandIcon.style.display = 'inline';-->
+<!--            collapseIcon.style.display = 'none';-->
+<!--        }-->
+<!--    });-->
+<!--});-->
+
+            // 处理侧边栏所有链接点击事件，根据不同链接展示对应内容
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    sidebarLinks.forEach(sidebarLink => sidebarLink.classList.remove('active'));
+                    this.classList.add('active');
+
+                    if (this.textContent === "权限设置") {
+                        mainContent.innerHTML = `
+                            <h2>权限设置</h2>
+                            <div class="search-form">
+                                <input type="text" id="searchRoleName" placeholder="角色名称">
+                                <button id="searchButton">查询</button>
+                            </div>
+                            <button id="addPermissionButton">新增权限</button>
+                            <table id="permissionListTable">
+                                <thead>
+                                    <tr>
+                                        <th>角色名称</th>
+                                        <th>可访问菜单</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                            <div class="pagination" id="pagination"></div>
+                        `;
+
+                        const addPermissionButton = document.getElementById('addPermissionButton');
+                        addPermissionButton.addEventListener('click', function () {
+                            modalTitle.textContent = '新增权限';
+                            document.getElementById('role_name').disabled = false;
+                            permissionForm.reset();
+                            permissionModal.style.display = 'block';
+                        });
+
+                        const searchButton = document.getElementById('searchButton');
+                        searchButton.addEventListener('click', function () {
+                            currentPage = 1;
+                            loadPermissions();
+                        });
+
+                        // 初始加载权限列表
+                        currentPage = 1;
+                        loadPermissions();
+                    } else if (this.textContent === "读者列表") {
+                        mainContent.innerHTML = `
+                            <h2>读者列表</h2>
+                            <div class="search-form">
+                                <input type="text" id="searchName" placeholder="姓名">
+                                <input type="text" id="searchCustomerId" placeholder="客户号">
+                                <input type="text" id="searchIdNumber" placeholder="身份证号码">
+                                <button id="searchButton">查询</button>
+                            </div>
+                            <button id="addReaderButton">添加读者</button>
+                            <table id="readerListTable">
+                                <thead>
+                                    <tr>
+                                        <th>客户号</th>
+                                        <th>客户姓名</th>
+                                        <th>性别</th>
+                                        <th>身份证号码</th>
+                                        <th>联系电话</th>
+                                        <th>电子邮箱</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                            <div class="pagination" id="pagination"></div>
+                        `;
+
+                        const addReaderButton = document.getElementById('addReaderButton');
+                        addReaderButton.addEventListener('click', function () {
+                            modalTitle.textContent = '添加读者';
+                            document.getElementById('addReaderForm').reset();
+                            document.getElementById('addReaderModal').style.display = 'block';
+                        });
+
+                        const searchButton = document.getElementById('searchButton');
+                        searchButton.addEventListener('click', function () {
+                            currentPage = 1;
+                            loadReaders();
+                        });
+
+                        // 获取读者列表
+                        currentPage = 1;
+                        loadReaders();
+                    } else if (this.textContent === "用户管理") {
+                        mainContent.innerHTML = `
+                            <h2>用户管理</h2>
+                            <div class="search-form">
+                                <input type="text" id="searchUsername" placeholder="用户名">
+                                <button id="searchButton">查询</button>
+                            </div>
+                            <table id="userListTable">
+                                <thead>
+                                    <tr>
+                                        <th>用户名</th>
+                                        <th>用户角色</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                            <div class="pagination" id="pagination"></div>
+                        `;
+
+                        const searchButton = document.getElementById('searchButton');
+                        searchButton.addEventListener('click', function () {
+                            currentPage = 1;
+                            loadUsers();
+                        });
+
+                        // 初始加载用户列表
+                        currentPage = 1;
+                        loadUsers();
+                    } else {
+                        mainContent.innerHTML = `<h2>当前页面</h2><p>${this.textContent}页面内容</p>`;
+                    }
+                });
+            });
+
+            // 关闭弹窗
+            closeModalButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    permissionModal.style.display = 'none';
+                    addReaderModal.style.display = 'none';
+                    assignRoleModal.style.display = 'none';
+                });
+            });
+
+            const addReaderForm = document.getElementById('addReaderForm');
+            if (addReaderForm) {
+                addReaderForm.addEventListener('submit', function (event) {
+                    console.log('表单提交事件被触发');
+                    event.preventDefault();
+                    // 简单验证，这里可以根据实际需求完善更严格的验证逻辑
+                    const customer_id = document.getElementById('customer_id').value;
+                    const customer_name = document.getElementById('customer_name').value;
+                    const gender = document.getElementById('gender').value;
+                    const id_number = document.getElementById('id_number').value;
+                    const contact_phone = document.getElementById('contact_phone').value;
+                    const email = document.getElementById('email').value;
+
+                    // 增加简单的格式验证
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    const phoneRegex = /^\d{11}$/;
+                    const idRegex = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+
+                    if (customer_id === "" || customer_name === "" || gender === "" || id_number === "" || contact_phone === "" || email === "") {
+                        alert('请填写完整所有必填项');
+                        return;
+                    }
+
+                    if (!emailRegex.test(email)) {
+                        alert('请输入有效的电子邮箱地址');
+                        return;
+                    }
+
+                    if (!phoneRegex.test(contact_phone)) {
+                        alert('请输入有效的 11 位手机号码');
+                        return;
+                    }
+
+                    if (!idRegex.test(id_number)) {
+                        alert('请输入有效的身份证号码');
+                        return;
+                    }
+
+                    // 构造要发送到服务器的数据对象
+                    const data = {
+                        customer_id: customer_id,
+                        customer_name: customer_name,
+                        gender: gender,
+                        id_number: id_number,
+                        contact_phone: contact_phone,
+                        email: email
+                    };
+                    console.log('发送的数据:', data);
+                    // 打印发送的数据
+                    // 判断是添加还是修改操作
+                    const isEdit = modalTitle.textContent === '修改读者信息';
+                    const url = isEdit ? `http://127.0.0.1:5000/update_reader/${customer_id}` : 'http://127.0.0.1:5000/create_customer';
+                    const method = isEdit ? 'PUT' : 'POST';
+                    // 使用fetch API发送请求到接口
+                    fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            alert(isEdit ? '读者信息修改成功' : '读者添加成功');
+                            addReaderModal.style.display = 'none';
+                            // 刷新读者列表
+                            loadReaders();
+                        } else {
+                            if (result.message.includes('UNIQUE constraint failed: readers.email')) {
+                                alert('该电子邮箱地址已被使用，请使用其他邮箱地址。');
+                            } else if (result.message.includes('UNIQUE constraint failed: readers.customer_id')) {
+                                alert('该客户号已被使用，请使用其他客户号。');
+                            } else if (result.message.includes('UNIQUE constraint failed: readers.id_number')) {
+                                alert('该身份证号码已被使用，请检查输入。');
+                            } else {
+                                alert(result.message);
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('接口调用出错：', error);
+                        alert('接口调用出错，请检查网络或联系管理员');
+                    });
+                });
+            }
+
+            // 修改读者信息
+            window.editReader = function (customer_id) {
+                fetch(`http://127.0.0.1:5000/get_reader/${customer_id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`网络请求失败，状态码：${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(reader => {
+                    if (reader.success === false) {
+                        alert(reader.message); // 显示后端返回的错误信息
+                        return;
+                    }
+                    // 填充表单数据
+                    document.getElementById('modalTitle').textContent = '修改读者信息';
+                    document.getElementById('customer_id').value = reader.customer_id;
+                    document.getElementById('customer_name').value = reader.customer_name;
+                    document.getElementById('gender').value = reader.gender;
+                    document.getElementById('id_number').value = reader.id_number;
+                    document.getElementById('contact_phone').value = reader.contact_phone;
+                    document.getElementById('email').value = reader.email;
+                    document.getElementById('addReaderModal').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('获取读者信息出错：', error);
+                    alert('获取读者信息出错，请检查网络或联系管理员');
+                });
+            };
+
+            // 删除读者信息
+            window.deleteReader = function (customer_id) {
+                if (confirm('确定要删除该读者信息吗？')) {
+                    fetch(`http://127.0.0.1:5000/delete_reader/${customer_id}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            alert('读者信息删除成功');
+                            // 刷新读者列表
+                            loadReaders();
+                        } else {
+                            alert(result.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('删除读者信息出错：', error);
+                        alert('删除读者信息出错，请检查网络或联系管理员');
+                    });
+                }
+            };
+
+            // 加载读者列表
+            function loadReaders() {
+                console.log('正在加载读者列表');
+                const searchName = document.getElementById('searchName').value;
+                const searchCustomerId = document.getElementById('searchCustomerId').value;
+                const searchIdNumber = document.getElementById('searchIdNumber').value;
+
+                let url = `http://127.0.0.1:5000/get_readers`;
+                if (searchName || searchCustomerId || searchIdNumber) {
+                    url += '?';
+                    if (searchName) {
+                        url += `name=${searchName}&`;
+                    }
+                    if (searchCustomerId) {
+                        url += `customer_id=${searchCustomerId}&`;
+                    }
+                    if (searchIdNumber) {
+                        url += `id_number=${searchIdNumber}&`;
+                    }
+                    url = url.slice(0, -1);  // 移除最后一个 &
+                }
+
+                fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`网络请求失败，状态码：${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    console.log('获取到的读者列表数据：', result);
+                    const readerList = result.readers;
+                    const startIndex = (currentPage - 1) * itemsPerPage;
+                    const endIndex = startIndex + itemsPerPage;
+                    const paginatedReaders = readerList.slice(startIndex, endIndex);
+                    const tableBody = document.querySelector('#readerListTable tbody');
+                    tableBody.innerHTML = '';
+                    paginatedReaders.forEach(reader => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${reader.customer_id}</td>
+                            <td>${reader.customer_name}</td>
+                            <td>${reader.gender}</td>
+                            <td>${reader.id_number}</td>
+                            <td>${reader.contact_phone}</td>
+                            <td>${reader.email}</td>
+                            <td>
+                                <button onclick="editReader('${reader.customer_id}')">修改</button>
+                                <button onclick="deleteReader('${reader.customer_id}')">删除</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+
+                    // 生成分页控件
+                    const totalPages = Math.ceil(readerList.length / itemsPerPage);
+                    const pagination = document.getElementById('pagination');
+                    pagination.innerHTML = '';
+
+                    if (totalPages > 1) {
+                        const prevButton = document.createElement('button');
+                        prevButton.textContent = '上一页';
+                        prevButton.disabled = currentPage === 1;
+                        prevButton.addEventListener('click', function () {
+                            if (currentPage > 1) {
+                                currentPage--;
+                                loadReaders();
+                            }
+                        });
+                        pagination.appendChild(prevButton);
+
+                        for (let i = 1; i <= totalPages; i++) {
+                            const pageButton = document.createElement('button');
+                            pageButton.textContent = i;
+                            pageButton.disabled = i === currentPage;
+                            pageButton.addEventListener('click', function () {
+                                currentPage = i;
+                                loadReaders();
+                            });
+                            pagination.appendChild(pageButton);
+                        }
+
+                        const nextButton = document.createElement('button');
+                        nextButton.textContent = '下一页';
+                        nextButton.disabled = currentPage === totalPages;
+                        nextButton.addEventListener('click', function () {
+                            if (currentPage < totalPages) {
+                                currentPage++;
+                                loadReaders();
+                            }
+                        });
+                        pagination.appendChild(nextButton);
+                    }
+                })
+                .catch(error => {
+                    console.error('获取读者列表出错：', error);
+                    alert('获取读者列表出错，请检查网络或联系管理员');
+                });
+            }
+
+            // 加载用户列表
+            function loadUsers() {
+                const searchUsername = document.getElementById('searchUsername').value;
+
+                let url = `http://127.0.0.1:5000/get_users`;
+                if (searchUsername) {
+                    url += `?username=${searchUsername}`;
+                }
+
+                fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`网络请求失败，状态码：${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    const userList = result.users;
+                    const startIndex = (currentPage - 1) * itemsPerPage;
+                    const endIndex = startIndex + itemsPerPage;
+                    const paginatedUsers = userList.slice(startIndex, endIndex);
+                    const tableBody = document.querySelector('#userListTable tbody');
+                    tableBody.innerHTML = '';
+                    paginatedUsers.forEach(user => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${user.username}</td>
+                            <td>${user.role_name || '无'}</td>
+                            <td>
+                                <button onclick="assignRole('${user.id}', '${user.username}')">分配角色</button>
+                                <button onclick="lockUser('${user.id}')">锁定</button>
+                                <button onclick="unlockUser('${user.id}')">解锁</button>
+                                <button onclick="resetPassword('${user.id}')">密码重置</button>
+                                <button onclick="deleteUser('${user.id}')">删除</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+
+                    // 生成分页控件
+                    const totalPages = Math.ceil(userList.length / itemsPerPage);
+                    const pagination = document.getElementById('pagination');
+                    pagination.innerHTML = '';
+
+                    if (totalPages > 1) {
+                        const prevButton = document.createElement('button');
+                        prevButton.textContent = '上一页';
+                        prevButton.disabled = currentPage === 1;
+                        prevButton.addEventListener('click', function () {
+                            if (currentPage > 1) {
+                                currentPage--;
+                                loadUsers();
+                            }
+                        });
+                        pagination.appendChild(prevButton);
+
+                        for (let i = 1; i <= totalPages; i++) {
+                            const pageButton = document.createElement('button');
+                            pageButton.textContent = i;
+                            pageButton.disabled = i === currentPage;
+                            pageButton.addEventListener('click', function () {
+                                currentPage = i;
+                                loadUsers();
+                            });
+                            pagination.appendChild(pageButton);
+                        }
+
+                        const nextButton = document.createElement('button');
+                        nextButton.textContent = '下一页';
+                        nextButton.disabled = currentPage === totalPages;
+                        nextButton.addEventListener('click', function () {
+                            if (currentPage < totalPages) {
+                                currentPage++;
+                                loadUsers();
+                            }
+                        });
+                        pagination.appendChild(nextButton);
+                    }
+                })
+                .catch(error => {
+                    console.error('获取用户列表出错：', error);
+                    alert('获取用户列表出错，请检查网络或联系管理员');
+                });
+            }
+
+            // 锁定用户
+            window.lockUser = function (userId) {
+                if (confirm('确定要锁定该用户吗？')) {
+                    fetch(`http://127.0.0.1:5000/lock_user/${userId}`, {
+                        method: 'PUT'
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            alert('用户锁定成功');
+                            loadUsers();
+                        } else {
+                            alert(result.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('锁定用户出错：', error);
+                        alert('锁定用户出错，请检查网络或联系管理员');
+                    });
+                }
+            };
+
+            // 解锁用户
+            window.unlockUser = function (userId) {
+                if (confirm('确定要解锁该用户吗？')) {
+                    fetch(`http://127.0.0.1:5000/unlock_user/${userId}`, {
+                        method: 'PUT'
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            alert('用户解锁成功');
+                            loadUsers();
+                        } else {
+                            alert(result.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('解锁用户出错：', error);
+                        alert('解锁用户出错，请检查网络或联系管理员');
+                    });
+                }
+            };
+
+            // 重置密码
+            window.resetPassword = function (userId) {
+                if (confirm('确定要重置该用户的密码吗？')) {
+                    fetch(`http://127.0.0.1:5000/reset_password/${userId}`, {
+                        method: 'PUT'
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            alert('用户密码重置成功');
+                            loadUsers();
+                        } else {
+                            alert(result.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('重置密码出错：', error);
+                        alert('重置密码出错，请检查网络或联系管理员');
+                    });
+                }
+            };
+
+            // 删除用户
+            window.deleteUser = function (userId) {
+                if (confirm('确定要删除该用户吗？')) {
+                    fetch(`http://127.0.0.1:5000/delete_user/${userId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            alert('用户删除成功');
+                            loadUsers();
+                        } else {
+                            alert(result.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('删除用户出错：', error);
+                        alert('删除用户出错，请检查网络或联系管理员');
+                    });
+                }
+            };
+
+            // 分配角色
+            window.assignRole = function (userId, username) {
+                fetch('http://127.0.0.1:5000/get_permissions')
+                .then(response => response.json())
+                .then(result => {
+                    const permissions = result.permissions;
+                    const roleCheckboxes = document.getElementById('roleCheckboxes');
+                    roleCheckboxes.innerHTML = '';
+                    permissions.forEach(permission => {
+                        const div = document.createElement('div');
+                        div.className = 'menu-item';
+                        div.innerHTML = `
+                            <input type="radio" id="role_${permission.id}" name="role_id" value="${permission.id}">
+                            <label for="role_${permission.id}">${permission.role_name}</label>
+                        `;
+                        roleCheckboxes.appendChild(div);
+                    });
+
+                    document.getElementById('username').value = username;
+                    document.getElementById('assignRoleModal').style.display = 'block';
+
+                    document.getElementById('assignRoleForm').onsubmit = function (event) {
+                        event.preventDefault();
+                        const role_id = document.querySelector('input[name="role_id"]:checked').value;
+
+                        fetch('http://127.0.0.1:5000/assign_role', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                user_id: userId,
+                                role_id: role_id
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.success) {
+                                alert('角色分配成功');
+                                document.getElementById('assignRoleModal').style.display = 'none';
+                                loadUsers(); // 刷新用户列表
+                            } else {
+                                alert(result.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('接口调用出错：', error);
+                            alert('接口调用出错，请检查网络或联系管理员');
+                        });
+                    };
+                })
+                .catch(error => {
+                    console.error('获取权限列表出错：', error);
+                    alert('获取权限列表出错，请检查网络或联系管理员');
+                });
+            };
+
+            // 权限表单提交
+            permissionForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    const roleName = document.getElementById('role_name').value;
+    const accessibleMenus = Array.from(document.querySelectorAll('input[name="accessible_menus"]:checked')).map(checkbox => checkbox.value); // 获取选中的菜单项并转换为数组
+
+    const isEdit = modalTitle.textContent === '修改权限';
+    const url = isEdit ? `http://127.0.0.1:5000/update_permission/${currentPermissionId}` : 'http://127.0.0.1:5000/add_permission';
+    const method = isEdit ? 'PUT' : 'POST';
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            role_name: roleName,
+            accessible_menus: accessibleMenus // 直接传递数组
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            alert(isEdit ? '权限修改成功' : '权限新增成功');
+            permissionModal.style.display = 'none';
+            loadPermissions();
+        } else {
+            alert(result.message);
+        }
+    })
+    .catch(error => {
+        console.error('接口调用出错：', error);
+        alert('接口调用出错，请检查网络或联系管理员');
+    });
+});
+
+            // 加载权限列表
+            function loadPermissions() {
+    console.log('loadPermissions 函数被调用');
+
+    const searchRoleName = document.getElementById('searchRoleName').value;
+
+    let url = `http://127.0.0.1:5000/get_permissions`;
+    if (searchRoleName) {
+        url += `?role_name=${searchRoleName}`;
+    }
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`网络请求失败，状态码：${response.status}`);
+            }
+            return response.json();
+        })
+        .then(result => {
+            console.log('获取权限列表成功：', result);
+            const permissionList = result.permissions;
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedPermissions = permissionList.slice(startIndex, endIndex);
+            const tableBody = document.querySelector('#permissionListTable tbody');
+            if (!tableBody) {
+                console.error('未找到 #permissionListTable tbody 元素');
+                return;
+            }
+            tableBody.innerHTML = '';
+            paginatedPermissions.forEach(permission => {
+                const accessibleMenus = permission.accessible_menus;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${permission.role_name}</td>
+                    <td>${accessibleMenus.join(', ')}</td>
+                    <td>
+                        <button onclick="editPermission(${permission.id})">修改</button>
+                        <button onclick="deletePermission(${permission.id})">删除</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // 生成分页控件
+            const totalPages = Math.ceil(permissionList.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            if (!pagination) {
+                console.error('未找到 #pagination 元素');
+                return;
+            }
+            pagination.innerHTML = '';
+
+            if (totalPages > 1) {
+                const prevButton = document.createElement('button');
+                prevButton.textContent = '上一页';
+                prevButton.disabled = currentPage === 1;
+                prevButton.addEventListener('click', function () {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        loadPermissions();
+                    }
+                });
+                pagination.appendChild(prevButton);
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageButton = document.createElement('button');
+                    pageButton.textContent = i;
+                    pageButton.disabled = i === currentPage;
+                    pageButton.addEventListener('click', function () {
+                        currentPage = i;
+                        loadPermissions();
+                    });
+                    pagination.appendChild(pageButton);
+                }
+
+                const nextButton = document.createElement('button');
+                nextButton.textContent = '下一页';
+                nextButton.disabled = currentPage === totalPages;
+                nextButton.addEventListener('click', function () {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        loadPermissions();
+                    }
+                });
+                pagination.appendChild(nextButton);
+            }
+        })
+        .catch(error => {
+            console.error('获取权限列表出错：', error);
+            alert('获取权限列表出错，请检查网络或联系管理员');
+        });
+}
+
+            // 修改权限
+            window.editPermission = function (roleId) {
+                fetch(`http://127.0.0.1:5000/get_permission/${roleId}`)
+                .then(response => response.json())
+                .then(permission => {
+                    modalTitle.textContent = '修改权限';
+                    document.getElementById('role_name').value = permission.role_name;
+                    document.getElementById('role_name').disabled = true;
+                    currentPermissionId = roleId;
+
+                    // 清空之前的勾选
+                    document.querySelectorAll('input[name="accessible_menus"]').forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+
+                    // 根据返回的可访问菜单勾选对应的复选框
+                    permission.accessible_menus.forEach(menu => {
+                        const checkbox = document.querySelector(`input[name="accessible_menus"][value="${menu}"]`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                        }
+                    });
+
+                    permissionModal.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('获取权限信息出错：', error);
+                    alert('获取权限信息出错，请检查网络或联系管理员');
+                });
+            };
+
+            // 删除权限
+            window.deletePermission = function (roleId) {
+                if (confirm('确定要删除该权限吗？')) {
+                    fetch(`http://127.0.0.1:5000/delete_permission/${roleId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            alert('权限删除成功');
+                            loadPermissions();
+                        } else {
+                            alert(result.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('删除权限出错：', error);
+                        alert('删除权限出错，请检查网络或联系管理员');
+                    });
+                }
+            };
+
+<!--            // 在登录成功后动态展示菜单-->
+<!--            fetch('http://127.0.0.1:5000/login', {-->
+<!--                method: 'POST',-->
+<!--                headers: {-->
+<!--                    'Content-Type': 'application/json'-->
+<!--                },-->
+<!--                body: JSON.stringify({-->
+<!--                    username: username,-->
+<!--                    password: password-->
+<!--                })-->
+<!--            })-->
+<!--            .then(response => response.json())-->
+<!--            .then(result => {-->
+<!--                if (result.success) {-->
+<!--                    // 隐藏所有菜单项-->
+<!--                    document.querySelectorAll('.sidebar a').forEach(link => link.style.display = 'none');-->
+<!--                    // 显示可访问的菜单项-->
+<!--                    result.accessible_menus.forEach(menu => {-->
+<!--                        document.querySelectorAll(`.sidebar a:contains(${menu})`).forEach(link => link.style.display = 'block');-->
+<!--                    });-->
+<!--                    window.location.href = result.redirect;-->
+<!--                } else {-->
+<!--                    alert(result.message);-->
+<!--                }-->
+<!--            })-->
+<!--            .catch(error => {-->
+<!--                console.error('登录出错：', error);-->
+<!--                alert('登录出错，请检查网络或联系管理员');-->
+<!--            });-->
+
+
+
+
+<!--    topLevelLinks.forEach(link => {-->
+<!--        link.addEventListener('click', function (e) {-->
+<!--            e.preventDefault();-->
+<!--            const subMenu = this.nextElementSibling;-->
+<!--            const parentLi = this.parentNode;-->
+<!--            parentLi.classList.toggle('active');-->
+<!--            const expandIcon = this.querySelector('.fa-chevron-down');-->
+<!--            const collapseIcon = this.querySelector('.fa-chevron-up');-->
+<!--            if (parentLi.classList.contains('active')) {-->
+<!--                subMenu.style.display = 'block';-->
+<!--                expandIcon.style.display = 'none';-->
+<!--                collapseIcon.style.display = 'inline';-->
+<!--            } else {-->
+<!--                subMenu.style.display = 'none';-->
+<!--                expandIcon.style.display = 'inline';-->
+<!--                collapseIcon.style.display = 'none';-->
+<!--            }-->
+<!--        });-->
+<!--    });-->
+
+
+    </script>
+</body>
+</html>

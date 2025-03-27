@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书管理系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- 替换为你自己的 Font Awesome 套件 ID -->
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit-id.js" crossorigin="anonymous"></script>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: url('OIP-C.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            width: 350px;
+            text-align: center;
+        }
+
+        .login-container h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .form-group input {
+            width: 90%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            color: #333;
+            outline: none;
+        }
+
+        .form-group i {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 18px;
+        }
+
+        button {
+            width: 50%;
+            padding: 15px;
+            background: linear-gradient(45deg, #007BFF, #0056b3);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:hover {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .register-link {
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .register-link a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background">
+        <div class="login-container">
+            <h1>欢迎登录</h1>
+            <form id="login-form">
+                <div class="form-group">
+                    <input type="text" id="username" name="username" placeholder="用户名" required>
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" name="password" placeholder="密码" required>
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <button type="button" onclick="submitForm()" style="width: 145px">登录</button>
+            </form>
+            <p class="register-link">还没有账号？<a href="Registration page.html">注册</a></p>
+        </div>
+    </div>
+    <script>
+        function submitForm() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+        alert('用户名和密码不能为空');
+        return;
+    }
+
+    fetch('http://127.0.0.1:5000/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            // 将 accessible_menus 存储到 localStorage 中
+            localStorage.setItem('accessible_menus', JSON.stringify(result.accessible_menus));
+
+            // 跳转到主界面
+            window.location.href = result.redirect;
+        } else {
+            alert(result.message);
+        }
+    })
+    .catch(error => {
+        console.error('登录出错：', error);
+        alert('登录出错，请检查网络或联系管理员');
+    });
+}
+
+        // 监听 Enter 键
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                submitForm();
+            }
+        });
+    </script>
+</body>
+
+</html>

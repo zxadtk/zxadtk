@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>图书管理系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- 替换为你自己的 Font Awesome 套件 ID -->
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit-id.js" crossorigin="anonymous"></script>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: url('OIP-C.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* 背景遮罩层样式 */
+       .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 注册容器样式，与登录容器保持一致 */
+       .register-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            width: 350px;
+            text-align: center;
+        }
+
+        /* 注册容器内标题样式 */
+       .register-container h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        /* 表单组样式，用于包裹输入框等元素 */
+       .form-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        /* 表单组内输入框样式 */
+       .form-group input {
+            width: 90%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            color: #333;
+            outline: none;
+        }
+
+        /* 表单组内图标样式，这里暂时没有图标，若需要可添加 */
+       .form-group i {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 18px;
+        }
+
+        /* 注册按钮样式，与登录按钮保持一致 */
+        button {
+            width: 50%;
+            padding: 15px;
+            background: linear-gradient(45deg, #007BFF, #0056b3);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        /* 输入框悬停样式 */
+       .form-group input:hover {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 注册按钮悬停样式 */
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 消息提示样式 */
+        #message {
+            color: blue;
+            text-decoration: none;
+            position: absolute;
+            top: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background">
+        <div class="register-container">
+            <h1>欢迎注册</h1>
+            <form id="registrationForm">
+                <div class="form-group">
+                    <label for="username">用户名：</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码：</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="passwordConfirm">确认密码：</label>
+                    <input type="password" id="passwordConfirm" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">邮箱：</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div style="display: flex; justify-content: center;">
+                    <button type="button" onclick="submitForm()">注册</button>
+                </div>
+            </form>
+            <div id="message"></div>
+        </div>
+    </div>
+    <script>
+        function submitForm() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('passwordConfirm').value;
+            const email = document.getElementById('email').value;
+
+            // 检查用户名是否为空
+            if (username === '') {
+                alert('账号不能为空！');
+                return;
+            }
+            // 检查密码是否为空
+            if (password === '') {
+                alert('密码不能为空！');
+                return;
+            }
+            // 检查两次输入的密码是否一致
+            if (password!== passwordConfirm) {
+                alert('两次输入的密码不一致，请重新输入！');
+                return;
+            }
+            // 简单的邮箱格式验证
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('请输入有效的邮箱地址！');
+                return;
+            }
+
+            const data = {
+                "username": username,
+                "password": password,
+                "email": email
+            };
+
+            fetch('http://127.0.0.1:5000/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+               .then(response => response.json())
+               .then(data => {
+                    const messageDiv = document.getElementById('message');
+                    if (data.success) {
+                        messageDiv.textContent = '注册成功，即将跳转...';
+                        window.location.href = data.redirect;
+                    } else {
+                        messageDiv.textContent = data.message;
+                    }
+                })
+               .catch(error => {
+                    console.error('Error:', error);
+                    const messageDiv = document.getElementById('message');
+                    messageDiv.textContent = '服务异常';
+                });
+        }
+    </script>
+</body>
+
+</html>
